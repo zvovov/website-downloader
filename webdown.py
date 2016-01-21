@@ -8,88 +8,104 @@ def hit_it(url):
     try:
         r = requests.get(url)
     except:
-        exit('Error 2: Could not connect to the given URL')
+        print('Error 2: Could not connect to the given URL')
+        initializer()
     return r
+
+def get_a(soup, url):
+    """
+    Prints href of all <a> links
+    """
+    a_tags = soup.find_all('a')
+    print(len(a_tags), "<a> TAGS")
+    for _ in a_tags:
+        try:
+            if _['href'].startswith('/'):
+                # links on the input_url
+                print(url+_['href'])
+            else:
+                # external links
+                print(_['href'])
+        except:
+            print("Error 5: hyperlink not found.")
 
 def get_link(soup):
     """
     Prints href of all <link> tags where rel=stylesheet
     """
     link_tags = soup.find_all('link')
-    print("<link> TAGS")
+    print(len(link_tags), "<link> TAGS")
     for _ in link_tags:
-        if _['rel'][0] == 'stylesheet':
-            print(_['href'])
+        try:
+            if _['rel'][0] == 'stylesheet':
+                print(_['href'])
+        except:
+            print("Error 4: css file not found.")
 
-def get_a(soup):
-    """
-    Prints href of all <a> links
-    """
-    a_tags = soup.find_all('a')
-    print("<a> TAGS")
-    for _ in a_tags:
-        # print(_['href'])
-        if _['href'].startswith('/'):
-            # links on the input_url
-            print(input_url+_['href'])
-        else:
-            # external links
-            print(_['href'])
 
 def get_script(soup):
     """
     Prints src of all <script> tags
     """
     script_tags = soup.find_all('script')
-    print("<script> TAGS")
+    print(len(script_tags), "<script> TAGS")
     for _ in script_tags:
-        print(type(_))
-        # print(_.get(['src']))
+        try:
+            print(_['src'])
+        except:
+            print("Error 3: javascript file not found.")
 
-def interface(soup):
+def interface(soup, url):
     """
     User Friendly interface
     """
-    choice = input("""Press 1, 2, or 3. Then press Enter:
-                    1. Show all hyperlinks on the webpage.
-                    2. Show all css files on the webpage.
-                    3. Show all javascript files on the webpage.
-                    4. Enter a new URL.
-                    5. Exit. 
-                    """)
-    print(choice)
+    wrong_choice_count = 0
+    while(True):
+        choice = input("""\nPress a number 1-5. Then press Enter:
+                        1. Show all hyperlinks on the webpage.
+                        2. Show all css files on the webpage.
+                        3. Show all javascript files on the webpage.
+                        4. Enter a new URL.
+                        5. Exit. 
+                        """)
+        if choice == "1":
+            get_a(soup, url)
+        elif choice == "2":    
+            get_link(soup)
+        elif choice == "3":
+            get_script(soup)
+        elif choice == "4":    
+            initializer()
+        elif choice == "5":    
+            exit()
+        else:
+            wrong_choice_count += 1
+            print("\nWrong choice.")
+            if wrong_choice_count > 3:
+                exit()
 
 def initializer():
     """
     Prompts user to enter URL and diplays interface.
     """
-    entered_url = input('Enter website url: ').strip()
+    entered_url = input('\nEnter website url: ').strip()
 
     # Add 'http://' if not present
     if not entered_url.startswith('http'):
         input_url = 'http://' + entered_url
+    
     print('Connecting to: ' + input_url)
 
     if input_url.count('.') < 4:
         # At most 3 dots in URL are valid
         r = hit_it(input_url)
-
         soup = BeautifulSoup(r.text, 'html.parser')
-        #print(soup)
-        
-        # interface(soup)
-        # <link> tags
-        # get_link(soup)
-
-        # # <a> tags
-        # get_a(soup)
-
-        # <script> tags
-        get_script(soup)
-
+        interface(soup, input_url)
+    
     else:
         # More than 3 dots in URL
-        exit('Error 1: Invalid URL')
+        print('Error 1: Invalid URL')
+        initializer()
 
 if __name__ == '__main__':
     
