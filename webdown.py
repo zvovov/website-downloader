@@ -11,7 +11,7 @@ def hit_it(url):
         exit('Error 2: Could not connect to the given URL')
     return r
 
-def get_link_tags(soup):
+def get_link(soup):
     """
     Prints href of all <link> tags where rel=stylesheet
     """
@@ -21,7 +21,7 @@ def get_link_tags(soup):
         if _['rel'][0] == 'stylesheet':
             print(_['href'])
 
-def get_a_links(soup):
+def get_a(soup):
     """
     Prints href of all <a> links
     """
@@ -36,6 +36,15 @@ def get_a_links(soup):
             # external links
             print(_['href'])
 
+def get_script(soup):
+    """
+    Prints src of all <script> tags
+    """
+    script_tags = soup.find_all('script')
+    print("<script> TAGS")
+    for _ in script_tags:
+        print(_['src'])
+
 if __name__ == '__main__':
     
     print('\n--- Webpage Asset Viewer ---\n')
@@ -49,24 +58,19 @@ if __name__ == '__main__':
 
     if input_url.count('.') < 4:
         # At most 3 dots in URL are valid
-        # MAIN LOGIC
         r = hit_it(input_url)
 
         soup = BeautifulSoup(r.text, 'html.parser')
         #print(soup)
 
         # <link> tags
-        # get_link_tags(soup)
+        get_link(soup)
 
         # <a> tags
-        # get_a_tags(soup)
+        get_a(soup)
 
         # <script> tags
-        script_tags = soup.find_all('script')
-        print("<script> TAGS")
-        for _ in script_tags:
-            print(_['src'])
-            
+        get_script(soup)
 
     else:
         # More than 3 dots in URL
