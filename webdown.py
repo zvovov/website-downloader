@@ -2,25 +2,49 @@ import json, requests
 from bs4 import BeautifulSoup
 
 def hit_it(url):
-    '''
+    """
     Hit the input url. Return requests object is successful. Die, if not.
-    '''
+    """
     try:
         r = requests.get(url)
     except:
         exit('Error 2: Could not connect to the given URL')
     return r
 
+def get_link_tags(soup):
+    """
+    Prints href of all <link> tags where rel=stylesheet
+    """
+    link_tags = soup.find_all('link')
+    print("<link> TAGS")
+    for _ in link_tags:
+        if _['rel'][0] == 'stylesheet':
+            print(_['href'])
+
+def get_a_links(soup):
+    """
+    Prints href of all <a> links
+    """
+    a_tags = soup.find_all('a')
+    print("<a> TAGS")
+    for _ in a_tags:
+        # print(_['href'])
+        if _['href'].startswith('/'):
+            # links on the input_url
+            print(input_url+_['href'])
+        else:
+            # external links
+            print(_['href'])
 
 if __name__ == '__main__':
     
-    print('\n--- Static Website Downloader ---\n')
+    print('\n--- Webpage Asset Viewer ---\n')
 
-    input_url = input('Enter website url: ').strip()
+    entered_url = input('Enter website url: ').strip()
 
     # Add 'http://' if not present
-    if not input_url.startswith('http'):
-        input_url = 'http://' + input_url
+    if not entered_url.startswith('http'):
+        input_url = 'http://' + entered_url
     print('Connecting to: ' + input_url)
 
     if input_url.count('.') < 4:
@@ -31,38 +55,17 @@ if __name__ == '__main__':
         soup = BeautifulSoup(r.text, 'html.parser')
         #print(soup)
 
-        # <a> tags
-        a_tags = soup.find_all('a')
-        for _ in a_tags:
-            if not _['href'].startswith('/'):
-                # if link points to an external location (not this site)
-                print(_['href'])
-
         # <link> tags
-        link_tags = soup.find_all('link')
-        for _ in link_tags:
-            try:
-                if _['rel'] == "stylesheet":
-                    # if css
-                    if not _['href'].endswith('.css'):
-                        # if css file is hosted elsewhere
-                        css_r = hit_it(_['href'])
-                        print(css_r.text)
-                    else:
-                        # if css file is found
-                        css_r = hit_it(_['href'])
-                        print(css_r.text)
-            except:
-                print('Sum ting wong in link')
+        # get_link_tags(soup)
+
+        # <a> tags
+        # get_a_tags(soup)
 
         # <script> tags
         script_tags = soup.find_all('script')
+        print("<script> TAGS")
         for _ in script_tags:
-            try:
-                script_r = hit_it(_['src'])
-                print(script_r.text)
-            except:
-                print('Sum ting wong in script')
+            print(_['src'])
             
 
     else:
