@@ -92,8 +92,10 @@ def initializer():
 
     # Add 'http://' if not present
     if not entered_url.startswith('http'):
-        input_url = 'http://' + entered_url
-    
+        input_url = 'https://' + entered_url
+    else:
+        input_url = entered_url
+
     print('Connecting to: ' + input_url)
 
     if input_url.count('.') < 4:
